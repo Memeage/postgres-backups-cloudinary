@@ -9,15 +9,15 @@ import { env } from "./env";
 import cloudinary from 'cloudinary'
 
 cloudinary.v2.config({
-  cloud_name: process.env.cloud_name,
-  api_key: process.env.api_key,
-  api_secret: process.env.api_secret,
+  cloud_name: env.cloud_name,
+  api_key: env.api_key,
+  api_secret: env.api_secret,
   secure: true,
 });
 
 export const uploadCloudinary = async (path: string, filename?: string) => {
   return await cloudinary.v2.uploader.upload(path, {
-    folder: process.env.folder || 'backups',
+    folder: env.folder || 'backups',
     public_id: filename
   })
 }
