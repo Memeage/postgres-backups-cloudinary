@@ -15,16 +15,17 @@ cloudinary.v2.config({
   secure: true,
 });
 
-export const uploadCloudinary = async (path: string) => {
+export const uploadCloudinary = async (path: string, filename?: string) => {
   return await cloudinary.v2.uploader.upload(path, {
-    folder: process.env.folder || 'backups'
+    folder: process.env.folder || 'backups',
+    public_id: filename
   })
 }
 
 const uploadToS3 = async ({ name, path }: { name: string, path: string }) => {
   console.log("Uploading backup to cloudinary...");
 
-  const res = await uploadCloudinary(path)
+  const res = await uploadCloudinary(path, name)
 
   console.log("Backup uploaded to cloudinary...", res);
 }
