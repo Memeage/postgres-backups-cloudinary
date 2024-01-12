@@ -1,6 +1,4 @@
 import { exec, execSync } from "child_process";
-import { S3Client, S3ClientConfig } from "@aws-sdk/client-s3";
-import { Upload } from "@aws-sdk/lib-storage";
 import { createReadStream, unlink, statSync } from "fs";
 import { filesize } from "filesize";
 import path from "path";
@@ -8,32 +6,27 @@ import os from "os";
 
 import { env } from "./env";
 
+import cloudinary from 'cloudinary'
+
+cloudinary.v2.config({
+  cloud_name: process.env.cloud_name,
+  api_key: process.env.api_key,
+  api_secret: process.env.api_secret,
+  secure: true,
+});
+
+export const uploadCloudinary = async (path: string) => {
+  return await cloudinary.v2.uploader.upload(path, {
+    folder: process.env.folder || 'backups'
+  })
+}
+
 const uploadToS3 = async ({ name, path }: { name: string, path: string }) => {
-  console.log("Uploading backup to S3...");
+  console.log("Uploading backup to cloudinary...");
 
-  const bucket = env.AWS_S3_BUCKET;
+  const res = await uploadCloudinary(path)
 
-  const clientOptions: S3ClientConfig = {
-    region: env.AWS_S3_REGION
-  }
-
-  if (env.AWS_S3_ENDPOINT) {
-    console.log(`Using custom endpoint: ${env.AWS_S3_ENDPOINT}`)
-    clientOptions['endpoint'] = env.AWS_S3_ENDPOINT;
-  }
-
-  const client = new S3Client(clientOptions);
-
-  await new Upload({
-    client,
-    params: {
-      Bucket: bucket,
-      Key: name,
-      Body: createReadStream(path),
-    },
-  }).done();
-
-  console.log("Backup uploaded to S3...");
+  console.log("Backup uploaded to cloudinary...", res);
 }
 
 const dumpToFile = async (filePath: string) => {
