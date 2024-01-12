@@ -18,7 +18,8 @@ cloudinary.v2.config({
 export const uploadCloudinary = async (path: string, filename?: string) => {
   return await cloudinary.v2.uploader.upload(path, {
     folder: env.folder || 'backups',
-    public_id: filename
+    // public_id: filename,
+    resource_type: "raw"
   })
 }
 
